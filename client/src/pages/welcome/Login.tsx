@@ -28,7 +28,7 @@ const Login = () => {
         try {
             const response = await axios.post('http://localhost:3000/login', loginData,  { withCredentials: true });
             const isUserAuthenticated = response.data.isAuthenticated
-            if(isUserAuthenticated === true) {
+            if (isUserAuthenticated === true) {
                 navigate("/dashboard");
             } 
         } catch (err) {

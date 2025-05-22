@@ -31,7 +31,7 @@ const publicRoutes = (app: Express, saltRounds: number) => {
             const user = result.rows[0];
             const sessionId = crypto.randomUUID();
 
-            await db.query("UPDATE users SET session_id = $1 WHERE id = $2", [sessionId, user.id]);
+            await db.query("UPDATE users SET session_id = $1 WHERE user_id = $2", [sessionId, user.user_id]);
 
             res.cookie("session_id", sessionId, { secure: true, httpOnly: true });
             console.log("Success");
@@ -67,10 +67,13 @@ const publicRoutes = (app: Express, saltRounds: number) => {
 
           const sessionId = crypto.randomUUID();
 
-          await db.query(
+          const userData = await db.query(
             "INSERT INTO users (first_name, last_name, email, password, session_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
             [fName, lName, email, hash, sessionId]
           );
+          console.log(userData)
+
+          await db.query("INSERT INTO accounts (user_id, account_type) VALUES ($1, $2)", [userData.rows[0].user_id, "Jumpstart"])
 
           res.cookie("session_id", sessionId, { secure: true, httpOnly: true });
           res.json({ isAuthenticated: true });

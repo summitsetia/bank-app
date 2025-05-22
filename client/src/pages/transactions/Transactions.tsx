@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import axios from 'axios';
 
 const Transactions = () => {
   const navigate = useNavigate()
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
     const authenticate = async () => {
@@ -12,9 +11,7 @@ const Transactions = () => {
         const response = await axios.post('http://localhost:3000/authenticate', {}, { withCredentials: true }) 
         const isUserAuthenticated = response.data.isAuthenticated
         console.log(isUserAuthenticated)
-        if(isUserAuthenticated === true) {
-          setIsAuthenticated(true)
-        } else {
+        if(!isUserAuthenticated) {
           navigate("/")
         }
       } catch (error) {
@@ -27,13 +24,9 @@ const Transactions = () => {
   }, [])
 
   return (
-    <>
-      {isAuthenticated && (
-        <div>
-          <h1>Transactions</h1>
-        </div>
-      )}
-    </>
+    <div className="">
+      <h1>Transactions</h1>
+    </div>
   );
 };
 

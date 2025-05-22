@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import db from "../db";
 
 interface CustomRequest extends Request {
-    user?: string;
+    user?: object;
 }
 
 const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -15,10 +15,12 @@ const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunct
             return next();
         } else {
             res.json({ isAuthenticated: false, message: "Session Id has Expired" });
+            return;
         }
     } catch (error) {
         console.log(error);
         res.json({ isAuthenticated: false, message: "Session Id has Expired or Does not exist" });
+        return;
     }
 
 }
