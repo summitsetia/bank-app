@@ -3,7 +3,10 @@ import authMiddleware from "../middleware/authMiddleware";
 import db from "../db";
 
 interface CustomRequest extends Request {
-    user?: string;
+    user?: {
+    user_id: string;
+    [key: string]: any;
+  };
 }
 
 const protectedRoutes = (app: Express) => {
@@ -14,16 +17,28 @@ const protectedRoutes = (app: Express) => {
         }
     });
 
+    // we already got req.user
     app.post("/userData", authMiddleware, async (req: CustomRequest, res: Response) => {
-        const sessionId = req.cookies.session_id;
-        const userResult = await db.query("SELECT user_id, first_name, last_name, email FROM users WHERE session_id = $1",[sessionId]);
+        const userId = req.user?.user_id;
 
-        if (userResult.rows.length > 0) {
-            const accountResult = await db.query("SELECT account_type, balance, created_at FROM accounts WHERE user_id = $1", [userResult.rows[0].user_id])
-            res.json({ userData: userResult.rows[0], accountData: accountResult.rows, message: "Success"})
-        } else {
-            res.json({ message: "User Not Found"})
-        }
+        const accountResult = await db.query("SELECT account_type, balance, created_at FROM accounts WHERE user_id = $1", [userId])
+        res.json({ userData:req.user, accountData: accountResult.rows, message: "Success"})
+    })
+
+    app.post("/accountData", authMiddleware, async (req: CustomRequest, res: Response) => {
+    const userId = req.user?.user_id;
+    const { accountType, balance } = req.body;
+
+    try {
+        await db.query(
+            "INSERT INTO accounts (user_id, account_type, balance) VALUES ($1, $2, $3)",
+            [userId, accountType, balance]
+        );
+        res.json({ isSuccessfull: true, message: "Success" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ isSuccessfull: false, message: "Database error" });
+    }
     })
 
 }

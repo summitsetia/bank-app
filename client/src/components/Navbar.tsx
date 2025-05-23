@@ -36,11 +36,15 @@ const Navbar = () => {
           <NavLink 
           to={item.to} 
           className={({ isActive }) =>
-              `${isActive ? "bg-white text-[#1c2e4a] font-semibold shadow-md" : "text-white hover:bg-white/20 hover:shadow-sm"} flex gap-3 py-3 px-5 rounded-xl duration-200`
+              `${isActive ? "bg-white text-[#1c2e4a] font-semibold shadow-md" : "text-white hover:bg-white/20 hover:shadow-sm"} h-full gap-3 py-3 px-5 rounded-xl duration-200`
           }
         >
-          <span className="w-5 h-5">{item.image}</span>
-          <span className="text-sm">{item.name}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-5 h-5">
+            {item.image}
+          </div>
+          <span className="text-sm leading-none">{item.name}</span>
+        </div>
         </NavLink>
         ))}
       </div>
