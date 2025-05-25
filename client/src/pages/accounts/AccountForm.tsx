@@ -1,12 +1,12 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import Button from "../../components/Button";
-import axios from "axios";
 import { useQueryClient } from '@tanstack/react-query';
+import client from "../api/axiosClient";
 
 const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
     const queryClient = useQueryClient();
-    
+
     const [accountData, setAccountData] = useState<{ accountType: string; balance: string }>({
         accountType: "",
         balance: ""
@@ -25,7 +25,7 @@ const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const accountResult = await axios.post('http://localhost:3000/accountData', accountData, { withCredentials: true })
+            const accountResult = await client.post('/accountData', accountData)
             console.log(accountResult.data.message)
             const isSuccessfull = accountResult.data.isSuccessfull
             if ( isSuccessfull === true) {

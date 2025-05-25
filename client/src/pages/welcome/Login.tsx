@@ -1,6 +1,6 @@
 import { useState } from "react"
-import axios from "axios"
 import { useNavigate } from "react-router-dom";
+import client from "../api/axiosClient";
 
 const Login = () => {
     
@@ -26,7 +26,7 @@ const Login = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3000/login', loginData,  { withCredentials: true });
+            const response = await client.post('/login', loginData);
             const isUserAuthenticated = response.data.isAuthenticated
             if (isUserAuthenticated === true) {
                 navigate("/dashboard");

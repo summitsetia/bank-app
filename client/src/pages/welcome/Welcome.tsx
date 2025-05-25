@@ -1,7 +1,7 @@
 import bankLogo from '../../assets/bankLogo.svg'
+import client from '../api/axiosClient';
 import Login from './Login'
 import { useEffect } from 'react';
-import axios from 'axios'
 import { useNavigate } from "react-router-dom";
 
 const Welcome = () => {
@@ -9,7 +9,7 @@ const Welcome = () => {
 
   useEffect(() => {
     const checkAuthenticated = async () => {
-      const response = await axios.post("http://localhost:3000/authenticate", {}, {withCredentials: true})
+      const response = await client.post("/authenticate", {})
       const isUserAuthenticated = response.data.isAuthenticated
       console.log(isUserAuthenticated)
       if (isUserAuthenticated) {

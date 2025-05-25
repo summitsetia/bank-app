@@ -1,10 +1,10 @@
-import axios from "axios"
 import { useEffect, useState, type JSX } from "react"
 import { useNavigate } from "react-router-dom"
 import AccountForm from "./AccountForm"
 import { useQuery } from "@tanstack/react-query"
 import { BadgeDollarSign, PiggyBank, Vault } from "lucide-react"
 import createAccountsQuery from "../api/createAccountsQuery"
+import client from "../api/axiosClient"
 
 const Accounts = () => {
     const accountIcons: { [key: string]: JSX.Element } = {
@@ -25,7 +25,7 @@ const Accounts = () => {
     useEffect(() => {
         const authenticate = async () => {
             try {
-                const response = await axios.post('http://localhost:3000/authenticate', {}, { withCredentials: true })
+                const response = await client.post('/authenticate', {})
                 const isUserAuthenticated = response.data.isAuthenticated
                 if (!isUserAuthenticated) {
                     navigate("/")
