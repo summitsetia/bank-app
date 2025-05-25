@@ -1,31 +1,20 @@
-import { useState, useEffect, type JSX } from 'react';
+import { useEffect, type JSX } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { BadgeDollarSign, PiggyBank, Vault } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import createAccountsQuery from '../api/createAccountsQuery';
 
 const Dashboard = () => {
-  interface UserData {
-    email: string;
-    first_name: string;
-    last_name: string;
-  }
-
-  interface AccountData {
-    account_type: string;
-    balance: string;
-    created_at: string;
-  }
-
-
-  const accountIcons: { [key: string]: JSX.Element }= {
+  const accountIcons: { [key: string]: JSX.Element } = {
     "Jumpstart": <BadgeDollarSign />,
     "Savings": <PiggyBank />,
     "Term Deposit": <Vault />
   }
 
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [accountData, setAccountData] = useState<Array<AccountData> | null>(null);
   const navigate = useNavigate()
+
+  const { data } = useQuery(createAccountsQuery())
 
   useEffect(() => {
     const authenticate = async () => {
@@ -44,22 +33,8 @@ const Dashboard = () => {
     authenticate()
   }, [])
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.post('http://localhost:3000/userData', {}, { withCredentials: true });
-        console.log(response.data.accountData);
-        setUserData(response.data.userData);
-        setAccountData(response.data.accountData)
-      } catch (error) {
-        console.log(error);
-      }
-    }
 
-    fetchUserData()
-  }, [])
-
-  const balanceSum = accountData?.reduce((accumulator, current) => {
+  const balanceSum = data?.accountData.reduce((accumulator, current) => {
     return accumulator + Number(current.balance);
   }, 0)
 
@@ -70,7 +45,7 @@ const Dashboard = () => {
           <h1>Photo</h1>
           <div className='flex flex-col'>
             <h1 className='text-base font-light'>Welcome Back,</h1>
-            <p className="text-xl font-bold">{userData?.first_name} {userData?.last_name}</p>
+            <p className="text-xl font-bold">{data?.userData.first_name} {data?.userData.last_name}</p>
           </div>
         </div>
         <div className="">
@@ -84,7 +59,7 @@ const Dashboard = () => {
         <div className="flex flex-col items-center mt-8 border rounded-2xl px-4 py-4 min-h-48">
           <h1 className='text-xl font-semibold text-gray-700'>All Accounts</h1> 
           <div className='flex justify-evenly pt-4 w-full'>
-            {accountData?.map((account) => (
+            {data?.accountData.map((account) => (
               <div className='flex flex-col items-center bg-white rounded-2xl shadow-md p-6'>
                 <div className='mb-2 text-blue-600'>
                   {accountIcons[account.account_type] || null}

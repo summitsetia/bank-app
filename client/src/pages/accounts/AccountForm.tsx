@@ -2,8 +2,11 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import Button from "../../components/Button";
 import axios from "axios";
+import { useQueryClient } from '@tanstack/react-query';
 
 const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
+    const queryClient = useQueryClient();
+    
     const [accountData, setAccountData] = useState<{ accountType: string; balance: string }>({
         accountType: "",
         balance: ""
@@ -26,6 +29,7 @@ const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
             console.log(accountResult.data.message)
             const isSuccessfull = accountResult.data.isSuccessfull
             if ( isSuccessfull === true) {
+                queryClient.invalidateQueries({ queryKey: ['accounts'] });
                 reverseState();
             }
         } catch (error) {
