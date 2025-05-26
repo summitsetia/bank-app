@@ -25,7 +25,7 @@ const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const accountResult = await client.post('/accountData', accountData)
+            const accountResult = await client.post('/accounts', accountData)
             console.log(accountResult.data.message)
             const isSuccessfull = accountResult.data.isSuccessfull
             if ( isSuccessfull === true) {

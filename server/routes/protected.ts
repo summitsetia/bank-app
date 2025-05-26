@@ -25,7 +25,7 @@ const protectedRoutes = (app: Express) => {
         res.json({ userData:req.user, accountData: accountResult.rows, message: "Success"})
     })
 
-    app.post("/accountData", authMiddleware, async (req: CustomRequest, res: Response) => {
+    app.post("/accounts", authMiddleware, async (req: CustomRequest, res: Response) => {
     const userId = req.user?.user_id;
     const { accountType, balance } = req.body;
 

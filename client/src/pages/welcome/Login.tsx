@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import client from "../api/axiosClient";
+import Button from "../../components/Button";
 
 const Login = () => {
     
@@ -44,7 +45,7 @@ const Login = () => {
             <div className='p-4'>
                 <input className='w-64 border rounded-lg p-3' name="password" type="password" placeholder='password' value={loginData.password} onChange={handleChange}/>
             </div>
-            <button className='w-64 border p-1 mb-12 cursor-pointer ' type="submit">Login</button>
+            <Button content={"Login"}/>
         </form>
     );
 };

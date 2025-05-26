@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import axios from "axios";
+import client from "./axiosClient";
 
 interface AccountData {
     account_type: string;
@@ -21,7 +21,7 @@ function createAccountsQuery() {
 }
 
 const fetchUserData = async (): Promise<{ userData: UserData; accountData: AccountData[] }> => {
-    const response = await axios.post('http://localhost:3000/userData', {}, { withCredentials: true });
+    const response = await client.post('/userData', {});
     return response.data; 
 };
 

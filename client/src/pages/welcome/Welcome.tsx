@@ -3,6 +3,7 @@ import client from '../api/axiosClient';
 import Login from './Login'
 import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 const Welcome = () => {
   const navigate = useNavigate()
@@ -27,7 +28,9 @@ const Welcome = () => {
         <div className="border flex flex-col items-center p-8">
             <img className='w-32 h-32' src={bankLogo} />
             <Login />
-            <a href="/register"><button className='w-64 border mb-4 cursor-pointer '>Register</button></a>
+            <div className='pt-4'>
+              <Link to="/register"><button className='w-64 border mb-4 cursor-pointer'>Register</button></Link>
+            </div>
         </div>
     </div>
   )

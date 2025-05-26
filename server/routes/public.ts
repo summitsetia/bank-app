@@ -8,6 +8,7 @@ interface RegisterData {
   lName: string;
   email: string;
   password: string;
+  username: string;
 }
 
 const publicRoutes = (app: Express, saltRounds: number) => {
@@ -51,7 +52,7 @@ const publicRoutes = (app: Express, saltRounds: number) => {
   });
 
   app.post("/register", async (req: Request, res: Response) => {
-    const { fName, lName, email, password }: RegisterData = req.body;
+    const { fName, lName, email, password, username }: RegisterData = req.body;
 
     try {
       const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [email]);
@@ -68,8 +69,8 @@ const publicRoutes = (app: Express, saltRounds: number) => {
           const sessionId = crypto.randomUUID();
 
           const userData = await db.query(
-            "INSERT INTO users (first_name, last_name, email, password, session_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-            [fName, lName, email, hash, sessionId]
+            "INSERT INTO users (first_name, last_name, email, password, username, session_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            [fName, lName, email, hash, username, sessionId]
           );
           console.log(userData)
 
@@ -84,6 +85,21 @@ const publicRoutes = (app: Express, saltRounds: number) => {
       res.status(500).json({ isAuthenticated: false, message: "Server error" });
     }
   });
+
+  app.post("/usernameCheck", async (req: Request, res: Response) => {
+    const username = req.body.username;
+    try {
+      const usernameResult = await db.query("SELECT * FROM users WHERE username = $1", [username]);
+      
+      if (usernameResult.rows.length > 0) {
+        res.json({ userFound: true});
+      } else {
+        res.json({ userFound: false});
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  })
 };
 
 export default publicRoutes;
