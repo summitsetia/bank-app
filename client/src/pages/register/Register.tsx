@@ -3,7 +3,9 @@ import bankLogo from '../../assets/bankLogo.svg';
 import { useNavigate } from "react-router-dom";
 import client from '../api/axiosClient';
 import Button from '../../components/Button';
-import usernameCheck from '../api/CheckUsername';
+import checkUsername from '../api/UsernameCheck';
+import { useMutation } from "@tanstack/react-query";
+import { Check, Ellipsis, X } from 'lucide-react';
 
 interface RegisterData {
     fName: string;
@@ -15,6 +17,7 @@ interface RegisterData {
 
 const Register = () => {
     const navigate = useNavigate();
+    const [userFound, setUserFound] = useState<boolean>(false);
     const [registerData, setRegisterData] = useState<RegisterData>({
         fName: '',
         lName: '',
@@ -46,8 +49,15 @@ const Register = () => {
         }
     };
 
+    const { mutate, isPending, isSuccess} = useMutation({
+        mutationFn: checkUsername,
+        onSuccess: (data) => {
+            setUserFound(data.userFound);
+        }
+    })
+
     const handleCheckUsername = () => {
-        mutation.mutate({})
+        mutate(registerData.username)
     }
 
     return (
@@ -60,7 +70,34 @@ const Register = () => {
                     <input className="p-2 rounded border" placeholder="Last Name" name="lName" onChange={handleChange} value={registerData.lName} required/>
                     <input className="p-2 rounded border" placeholder="Email" name="email" onChange={handleChange} value={registerData.email} required/>
                     <input className="p-2 rounded border" placeholder="Password" name="password" onChange={handleChange} type="password" value={registerData.password} required/>
-                    <input className="p-2 rounded border" placeholder="Username" name="username" onChange={handleChange} value={registerData.username} required/>
+                    <div className="relative">
+                        <input
+                            className="p-2 rounded border w-full pr-10"
+                            placeholder="Username"
+                            name="username"
+                            onChange={handleChange}
+                            onBlur={handleCheckUsername}
+                            value={registerData.username}
+                            required
+                        />
+                        
+                        {isPending && (
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                <Ellipsis />
+                            </div>
+                        )}
+
+                        {isSuccess && !userFound && (
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600">
+                                <Check />
+                            </div>
+                        )}
+                        {isSuccess && userFound && (
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600">
+                                <X />
+                            </div>
+                        )}
+                    </div>
                     <Button content={"Join"}/>
                 </form>
             </div>

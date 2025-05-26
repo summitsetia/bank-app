@@ -1,12 +1,12 @@
-import { X } from "lucide-react";
+import { Check, Ellipsis, X } from "lucide-react";
 import Button from "../../components/Button";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import createAccountsQuery from "../api/createAccountsQuery";
 import client from "../api/axiosClient";
+import checkUsername from "../api/UsernameCheck";
 
 const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
-
     const { data } = useQuery(createAccountsQuery())
 
     const [transactionData, settransactionData] = useState<{ 
@@ -15,12 +15,27 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
         fromAccount?: string;
         toAccount?: string; 
         title?: string;
-        personName?: string;
+        username?: string;
         description?: string;
      }>({
         transactionType: "",
         amount: ""
     });
+
+    const [userFound, setUserFound] = useState(false);
+
+    const { mutate, isPending, isSuccess} = useMutation({
+        mutationFn: checkUsername,
+        onSuccess: (data) => {
+            setUserFound(data.userFound);
+        }
+    })
+
+    const handleCheckUsername = () => {
+        if (transactionData.username) {
+            mutate(transactionData.username);
+        }
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {value, name} = e.target;
@@ -137,14 +152,34 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
                 {transactionData.transactionType === "PayToPerson" && (
                     <>
                         <div className="flex flex-col items-center gap-2">
-                            <label className="">Person Name</label>
-                            <input
-                                className="p-2 rounded border"
-                                name="personName"
-                                placeholder="Name Of Person"
-                                onChange={handleChange}
-                                value={transactionData.personName}
-                            />
+                            <label className="">Username</label>
+                            <div className="relative">
+                                <input
+                                    className="p-2 rounded border"
+                                    name="username"
+                                    placeholder="Account Username"
+                                    onChange={handleChange}
+                                    onBlur={handleCheckUsername}
+                                    value={transactionData.username}
+                                />
+
+                                {isPending && (
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                    <Ellipsis />
+                                </div>
+                                )}
+
+                                {isSuccess && userFound && (
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600">
+                                        <Check />
+                                    </div>
+                                )}
+                                {isSuccess && !userFound && (
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600">
+                                        <X />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="flex flex-col items-center gap-2">
                             <label>From Account</label>
