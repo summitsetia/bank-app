@@ -49,6 +49,12 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (transactionData.transactionType === "PayToPerson" && !userFound) {
+            alert("Cannot submit. Username not found.");
+            return; 
+        }
+        
         try {
             const transactionResult = await client.post('/transactions', transactionData)
             console.log(transactionResult.data.message)

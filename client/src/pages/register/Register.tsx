@@ -36,6 +36,10 @@ const Register = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (userFound) {
+            alert("Cannot submit. Username is already taken.");
+            return; 
+        }
         try {
             const response = await client.post('/register', registerData);
             const isUserAuthenticated = response.data.isAuthenticated
