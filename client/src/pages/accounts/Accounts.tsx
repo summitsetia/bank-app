@@ -1,10 +1,8 @@
-import { useEffect, useState, type JSX } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, type JSX } from "react"
 import AccountForm from "./AccountForm"
 import { useQuery } from "@tanstack/react-query"
 import { BadgeDollarSign, PiggyBank, Vault } from "lucide-react"
-import createAccountsQuery from "../api/createAccountsQuery"
-import client from "../api/axiosClient"
+import createAccountsQuery from "../../api/transactions"
 
 const Accounts = () => {
     const accountIcons: { [key: string]: JSX.Element } = {
@@ -13,7 +11,6 @@ const Accounts = () => {
         "Term Deposit": <Vault />
     }
 
-    const navigate = useNavigate()
     const [isShown, setIsShown] = useState<boolean>(false);
 
     const { data } = useQuery(createAccountsQuery())
@@ -21,23 +18,6 @@ const Accounts = () => {
     const reverseState = () => {
         setIsShown((prevValue) => !prevValue)
     }
-
-    useEffect(() => {
-        const authenticate = async () => {
-            try {
-                const response = await client.post('/authenticate', {})
-                const isUserAuthenticated = response.data.isAuthenticated
-                if (!isUserAuthenticated) {
-                    navigate("/")
-                }
-            } catch (error) {
-                console.log(error)
-                navigate("/")
-            }
-        }
-
-        authenticate()
-    }, [])
 
     return (
         <div className="flex flex-col h-screen w-full max-w-screen-xl mx-auto">

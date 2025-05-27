@@ -1,9 +1,7 @@
-import { useEffect, type JSX } from 'react';
-import { useNavigate } from "react-router-dom";
+import { type JSX } from 'react';
 import { BadgeDollarSign, PiggyBank, Vault } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import createAccountsQuery from '../api/createAccountsQuery';
-import client from '../api/axiosClient';
+import createAccountsQuery from '../../api/transactions';
 
 const Dashboard = () => {
   const accountIcons: { [key: string]: JSX.Element } = {
@@ -12,27 +10,7 @@ const Dashboard = () => {
     "Term Deposit": <Vault />
   }
 
-  const navigate = useNavigate()
-
   const { data } = useQuery(createAccountsQuery())
-
-  useEffect(() => {
-    const authenticate = async () => {
-      try {
-        const response = await client.post('/authenticate', {}, { withCredentials: true })
-        const isUserAuthenticated = response.data.isAuthenticated
-        if (!isUserAuthenticated) {
-          navigate("/")
-        }
-      } catch (error) {
-        console.log(error)
-        navigate("/")
-      }
-    }
-
-    authenticate()
-  }, [])
-
 
   const balanceSum = data?.accountData.reduce((accumulator, current) => {
     return accumulator + Number(current.balance);

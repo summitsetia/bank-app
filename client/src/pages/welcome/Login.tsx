@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom";
-import client from "../api/axiosClient";
+import client from "../../api/axiosClient";
 import Button from "../../components/Button";
 
 const Login = () => {

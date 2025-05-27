@@ -2,9 +2,9 @@ import { Check, Ellipsis, X } from "lucide-react";
 import Button from "../../components/Button";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import createAccountsQuery from "../api/createAccountsQuery";
-import client from "../api/axiosClient";
-import checkUsername from "../api/UsernameCheck";
+import createAccountsQuery from "../../api/transactions";
+import client from "../../api/axiosClient";
+import checkUsername from "../../api/UsernameCheck";
 
 const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
     const { data } = useQuery(createAccountsQuery())
@@ -54,7 +54,7 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
             alert("Cannot submit. Username not found.");
             return; 
         }
-        
+
         try {
             const transactionResult = await client.post('/transactions', transactionData)
             console.log(transactionResult.data.message)
@@ -88,21 +88,22 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
                         <option value="PayToPerson">Pay To Person</option>
                     </select>
                 </div>
+                {transactionData.transactionType && (
+                    <div className="flex flex-col items-center gap-2">
+                        <label>From Account</label>
+                        <select
+                            className="border rounded-2xl p-2"
+                            name="fromAccount"
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">--Select From--</option>
+                            {AccountOptions}
+                        </select>
+                    </div>
+                )}
                 {transactionData.transactionType === "Transfer" && (
                     <>
-                        <div className="flex flex-col items-center gap-2">
-                            <label>From Account</label>
-                            <select
-                                className="border rounded-2xl p-2"
-                                name="fromAccount"
-                                onChange={handleChange}
-                                required
-                            >
-                                <option value="">--Select From--</option>
-                                {AccountOptions}
-                            </select>
-                        </div>
-
                         <div className="flex flex-col items-center gap-2">
                             <label>To Account</label>
                             <select
@@ -114,17 +115,6 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
                                 <option value="">--Select To--</option>
                                 {AccountOptions}
                             </select>
-                        </div>
-
-                        <div className="flex flex-col items-center gap-2">
-                            <label className="">Description</label>
-                            <input
-                                className="p-2 rounded border"
-                                name="description"
-                                placeholder="Description Of Transfer"
-                                onChange={handleChange}
-                                value={transactionData.description}
-                            />
                         </div>
                     </>
                 )}
@@ -138,21 +128,9 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
                                 placeholder="Name Of Payment"
                                 onChange={handleChange}
                                 value={transactionData.title}
+                                required
                             />
                         </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <label>From Account</label>
-                            <select
-                                className="border rounded-2xl p-2"
-                                name="fromAccount"
-                                onChange={handleChange}
-                                required
-                            >
-                                <option value="">--Select From--</option>
-                                {AccountOptions}
-                            </select>
-                        </div>
-
                     </>
                 )}
                 {transactionData.transactionType === "PayToPerson" && (
@@ -167,6 +145,7 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
                                     onChange={handleChange}
                                     onBlur={handleCheckUsername}
                                     value={transactionData.username}
+                                    required
                                 />
 
                                 {isPending && (
@@ -187,28 +166,6 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
                                 )}
                             </div>
                         </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <label>From Account</label>
-                            <select
-                                className="border rounded-2xl p-2"
-                                name="fromAccount"
-                                onChange={handleChange}
-                                required
-                            >
-                                <option value="">--Select From--</option>
-                                {AccountOptions}
-                            </select>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <label className="">Description</label>
-                            <input
-                                className="p-2 rounded border"
-                                name="description"
-                                placeholder="Description Of Payment"
-                                onChange={handleChange}
-                                value={transactionData.description}
-                            />
-                        </div>
                     </>
                 )}
                 <div className="flex flex-col items-center gap-2">
@@ -220,6 +177,17 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
                         onChange={handleChange}
                         value={transactionData.amount}
                         type="number"
+                        required
+                    />
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                    <label className="">Description</label>
+                    <input
+                        className="p-2 rounded border"
+                        name="description"
+                        placeholder="Description Of Payment"
+                        onChange={handleChange}
+                        value={transactionData.description}
                     />
                 </div>
                 <Button content={"Create Transaction"} />

@@ -18,7 +18,7 @@ const protectedRoutes = (app: Express) => {
     });
 
     // we already got req.user
-    app.post("/userData", authMiddleware, async (req: CustomRequest, res: Response) => {
+    app.get("/userData", authMiddleware, async (req: CustomRequest, res: Response) => {
         const userId = req.user?.user_id;
 
         const accountResult = await db.query("SELECT account_type, balance, created_at FROM accounts WHERE user_id = $1", [userId])
@@ -41,25 +41,26 @@ const protectedRoutes = (app: Express) => {
     }
     })
 
-    app.post("/logout", authMiddleware, async (req: Request, res: Response) => {
-      // could consider one query
-      const sessionId = req.cookies.session_id;
-    
-      try {
-         const result = await db.query("SELECT user_id FROM users WHERE session_id = $1", [sessionId])
-         const userId = result.rows[0].user_id
-    
-         if (result.rows.length > 0) {
-          await db.query("UPDATE users SET session_id = NULL WHERE user_id = $1", [userId]);
-          res.clearCookie("session_id", { secure: true, httpOnly: true })
-          res.json({ isSuccessfull: true, message: "Logged out successfully" });
-         } else {
-          res.status(400).json({ isSuccessfull: false, message: "Invalid session." });
-         }
-      } catch (error) {
-        console.log(error);
-        res.status(500).json({ isSuccessfull: false, message: "Server error" });
-      }
+    app.post("/logout", authMiddleware, async (req: CustomRequest, res: Response) => {
+        try {
+            const userId = req.user?.user_id;
+            await db.query("UPDATE users SET session_id = NULL WHERE user_id = $1", [userId]);
+            res.clearCookie("session_id", { secure: true, httpOnly: true })
+            res.json({ isSuccessfull: true, message: "Logged out successfully" });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ isSuccessfull: false, message: "Server error" });
+        }
+    })
+
+    app.post("/transactions", authMiddleware, async (req: CustomRequest, res: Response) => {
+        const { amount, transactionType, description} = req.body;
+        try {
+            const userId = req.user?.user_id;
+            await db.query("INSERT INTO transactions (from_account_id, amount, transaction_type, description) VALUES ($1, $2, $3, $4)")
+        } catch (error) {
+            console.log(error);
+        }
     })
 
 }

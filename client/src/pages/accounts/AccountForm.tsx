@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import Button from "../../components/Button";
 import { useQueryClient } from '@tanstack/react-query';
-import client from "../api/axiosClient";
+import client from "../../api/axiosClient";
 
 const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
     const queryClient = useQueryClient();

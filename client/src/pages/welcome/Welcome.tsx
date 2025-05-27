@@ -1,5 +1,5 @@
 import bankLogo from '../../assets/bankLogo.svg'
-import client from '../api/axiosClient';
+import client from '../../api/axiosClient';
 import Login from './Login'
 import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";

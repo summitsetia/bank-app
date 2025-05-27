@@ -21,8 +21,9 @@ function createAccountsQuery() {
 }
 
 const fetchUserData = async (): Promise<{ userData: UserData; accountData: AccountData[] }> => {
-    const response = await client.post('/userData', {});
+    const response = await client.get('/userData');
     return response.data; 
 };
+
 
 export default createAccountsQuery;

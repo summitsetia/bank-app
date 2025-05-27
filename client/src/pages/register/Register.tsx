@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import bankLogo from '../../assets/bankLogo.svg';
 import { useNavigate } from "react-router-dom";
-import client from '../api/axiosClient';
+import client from '../../api/axiosClient';
 import Button from '../../components/Button';
-import checkUsername from '../api/UsernameCheck';
+import checkUsername from '../../api/UsernameCheck';
 import { useMutation } from "@tanstack/react-query";
 import { Check, Ellipsis, X } from 'lucide-react';
 
