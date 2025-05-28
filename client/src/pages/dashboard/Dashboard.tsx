@@ -2,6 +2,7 @@ import { type JSX } from 'react';
 import { BadgeDollarSign, PiggyBank, Vault } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { createAccountsQuery } from '../../api/accounts';
+import { createTransactionQuery } from '../../api/transactions';
 
 const Dashboard = () => {
   const accountIcons: { [key: string]: JSX.Element } = {
@@ -10,9 +11,10 @@ const Dashboard = () => {
     "Term Deposit": <Vault />
   }
 
-  const { data } = useQuery(createAccountsQuery())
+  const { data: accountData } = useQuery(createAccountsQuery())
+  const { data: transactionData } = useQuery(createTransactionQuery())
 
-  const balanceSum = data?.accountData.reduce((accumulator, current) => {
+  const balanceSum = accountData?.accountData.reduce((accumulator, current) => {
     return accumulator + Number(current.balance);
   }, 0)
 
@@ -23,7 +25,7 @@ const Dashboard = () => {
           <h1>Photo</h1>
           <div className='flex flex-col'>
             <h1 className='text-base font-light'>Welcome Back,</h1>
-            <p className="text-xl font-bold">{data?.userData.first_name} {data?.userData.last_name}</p>
+            <p className="text-xl font-bold">{accountData?.userData.first_name} {accountData?.userData.last_name}</p>
           </div>
         </div>
         <div className="">
@@ -37,7 +39,7 @@ const Dashboard = () => {
         <div className="flex flex-col items-center mt-8 border rounded-2xl px-4 py-4 min-h-48">
           <h1 className='text-xl font-semibold text-gray-700'>All Accounts</h1> 
           <div className='flex justify-evenly pt-4 w-full'>
-            {data?.accountData.map((account) => (
+            {accountData?.accountData.map((account) => (
               <div className='flex flex-col items-center bg-white rounded-2xl shadow-md p-6'>
                 <div className='mb-2 text-blue-600'>
                   {accountIcons[account.account_type] || null}
@@ -69,6 +71,11 @@ const Dashboard = () => {
               <h1>Account</h1>
               <h1>Price</h1>
             </div>
+            {transactionData?.data.map((item) => (
+              <div className='flex justify-between w-full'> 
+                {item.description}
+              </div>
+            ))}
           </div>
 
           <div className="flex flex-col items-center justify-center border rounded-2xl px-4 py-4 h-48">

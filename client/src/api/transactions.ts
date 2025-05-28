@@ -30,7 +30,7 @@ function createTransactionQuery() {
     })
 }
 
-const fetchTransactionData = async (): Promise<{ transactionData: TransactionData[] }> => {
+const fetchTransactionData = async (): Promise<{ data: TransactionData[] }> => {
     const response = await client.get('/transactionData');
     return response.data; 
 };

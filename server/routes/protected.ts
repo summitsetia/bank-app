@@ -54,12 +54,13 @@ const protectedRoutes = (app: Express) => {
     })
 
     app.post("/transactions", authMiddleware, async (req: CustomRequest, res: Response) => {
+        const userId = req.user?.user_id;
         const { amount, transactionType, fromAccount, description} = req.body;
         try {
             const transactionResult = 
             await db.query(
-                "INSERT INTO transactions (from_account_id, amount, transaction_type, description) VALUES ($1, $2, $3, $4) RETURNING transaction_id",
-                 [fromAccount, amount, transactionType, description]
+                "INSERT INTO transactions (user_id, from_account_id, amount, transaction_type, description) VALUES ($1, $2, $3, $4, $5) RETURNING transaction_id",
+                 [userId, fromAccount, amount, transactionType, description]
                 )
             const transactionId = transactionResult.rows[0].transaction_id;
             if (transactionType === "Payment") {
@@ -84,7 +85,21 @@ const protectedRoutes = (app: Express) => {
 
     app.get("/transactionData", authMiddleware, async (req: CustomRequest, res: Response) => {
         const userId = req.user?.user_id;
-
+        try {
+            const result = await db.query(         
+            "SELECT transactions.transaction_type, transactions.amount, transactions.from_account_id, transactions.description, transactions.created_at, transfer.to_account_id, payment.title, paytoperson.username \
+            FROM transactions \
+            LEFT JOIN transfer ON transactions.transaction_id = transfer.transaction_id \
+            LEFT JOIN payment ON transactions.transaction_id = payment.transaction_id \
+            LEFT JOIN paytoperson ON transactions.transaction_id = paytoperson.transaction_id \
+            WHERE transactions.user_id = $1", [userId]
+            )
+            const transactionData = result.rows;
+            res.json({ data: transactionData, isSuccessfull: true})
+        } catch (error) {
+            console.log(error);
+            res.json({ isSuccessfull: false });
+        }
     })
 
 }

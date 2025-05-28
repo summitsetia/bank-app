@@ -1,12 +1,14 @@
 import { Check, Ellipsis, X } from "lucide-react";
 import Button from "../../components/Button";
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createAccountsQuery }from "../../api/accounts";
 import checkUsername from "../../api/UsernameCheck";
 import { createTransaction } from "../../api/transactions";
 
 const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
+    const queryClient = useQueryClient();
+
     const [transactionData, settransactionData] = useState<{ 
         transactionType: string;
         amount: string;
@@ -43,7 +45,7 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
         mutationFn: createTransaction,
         onSuccess: (data) => {
             if (data.isSuccessfull === true) {
-                // queryClient.invalidateQueries({ queryKey: ['transactions'] });
+                queryClient.invalidateQueries({ queryKey: ['transactions'] });
                 reverseState();
             }
         },
