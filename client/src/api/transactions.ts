@@ -1,29 +1,39 @@
 import { queryOptions } from "@tanstack/react-query";
 import client from "./axiosClient";
 
-// interface transactionData {
-//     account_type: string;
-//     balance: string;
-//     created_at: string;
-// }
+interface TransactionData {
+    transactionType: string;
+    amount: string;
+    fromAccount: string;
+    description: string;
+    toAccount?: string; 
+    title?: string;
+    username?: string;
+    created_at: string;
+}
 
-// interface NewTransactionData {
-//   accountType: string;
-//   balance: string;
-// }
+interface NewTransactionData {
+    transactionType: string;
+    amount: string;
+    fromAccount: string;
+    description: string;
+    toAccount?: string; 
+    title?: string;
+    username?: string;
+}
 
 
-// function createTransactionQuery() {
-//     return queryOptions({
-//         queryKey: ['transactions'],
-//         queryFn: fetchTransactionData
-//     })
-// }
+function createTransactionQuery() {
+    return queryOptions({
+        queryKey: ['transactions'],
+        queryFn: fetchTransactionData
+    })
+}
 
-// const fetchTransactionData = async (): Promise<{ transactionData: TransactionData[] }> => {
-//     const response = await client.get('/transactionData');
-//     return response.data; 
-// };
+const fetchTransactionData = async (): Promise<{ transactionData: TransactionData[] }> => {
+    const response = await client.get('/transactionData');
+    return response.data; 
+};
 
 const createTransaction = async (transactionData: NewTransactionData) => {
     const response = await client.post('/transactions', transactionData);
@@ -31,4 +41,4 @@ const createTransaction = async (transactionData: NewTransactionData) => {
 }
 
 
-export {createTransaction};
+export {createTransactionQuery, createTransaction};

@@ -10,14 +10,16 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
     const [transactionData, settransactionData] = useState<{ 
         transactionType: string;
         amount: string;
-        fromAccount?: string;
+        fromAccount: string;
+        description: string;
         toAccount?: string; 
         title?: string;
         username?: string;
-        description?: string;
      }>({
         transactionType: "",
-        amount: ""
+        amount: "",
+        fromAccount: "",
+        description: ""
     });
 
     const [userFound, setUserFound] = useState(false);
@@ -72,7 +74,9 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
     }
 
     const AccountOptions = data?.accountData.map((item) => (
-        <option value={item.account_type}>{item.account_type}</option>
+        <option key={item.account_id} value={item.account_id}>
+            {item.account_name} - {item.account_type} (${item.balance})
+        </option>
     ))
 
     return (

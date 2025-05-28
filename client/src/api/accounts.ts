@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import client from "./axiosClient";
 
 interface AccountData {
+    account_id: string;
     account_type: string;
     balance: string;
     account_name: string;
