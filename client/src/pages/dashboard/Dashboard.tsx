@@ -1,7 +1,7 @@
 import { type JSX } from 'react';
 import { BadgeDollarSign, PiggyBank, Vault } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import createAccountsQuery from '../../api/transactions';
+import { createAccountsQuery } from '../../api/accounts';
 
 const Dashboard = () => {
   const accountIcons: { [key: string]: JSX.Element } = {
@@ -42,7 +42,8 @@ const Dashboard = () => {
                 <div className='mb-2 text-blue-600'>
                   {accountIcons[account.account_type] || null}
                 </div>
-                <h1 className='text-lg font-semibold text-gray-800'>{account.account_type}</h1>
+                <h2 className='text-2xl font-bold text-gray-800'>{account.account_name}</h2>
+                <h2 className='text-lg font-semibold text-gray-800'>{account.account_type}</h2>
                 <h1 className='text-xl font-bold text-gray-900'>${account.balance}</h1>
                 <p className='text-xs text-gray-500 mt-2'>Opened: {new Date(account.created_at).toDateString()}</p>
               </div>

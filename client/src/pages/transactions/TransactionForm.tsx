@@ -2,13 +2,11 @@ import { Check, Ellipsis, X } from "lucide-react";
 import Button from "../../components/Button";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import createAccountsQuery from "../../api/transactions";
-import client from "../../api/axiosClient";
+import { createAccountsQuery }from "../../api/accounts";
 import checkUsername from "../../api/UsernameCheck";
+import { createTransaction } from "../../api/transactions";
 
 const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
-    const { data } = useQuery(createAccountsQuery())
-
     const [transactionData, settransactionData] = useState<{ 
         transactionType: string;
         amount: string;
@@ -24,6 +22,8 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
 
     const [userFound, setUserFound] = useState(false);
 
+    const { data } = useQuery(createAccountsQuery())
+
     const { mutate, isPending, isSuccess} = useMutation({
         mutationFn: checkUsername,
         onSuccess: (data) => {
@@ -36,6 +36,19 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
             mutate(transactionData.username);
         }
     }
+
+    const { mutate: transactionMutate} = useMutation({
+        mutationFn: createTransaction,
+        onSuccess: (data) => {
+            if (data.isSuccessfull === true) {
+                // queryClient.invalidateQueries({ queryKey: ['transactions'] });
+                reverseState();
+            }
+        },
+        onError: (error) => {
+            console.log("Failed to create account", error);
+        }
+    })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {value, name} = e.target;
@@ -55,17 +68,7 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
             return; 
         }
 
-        try {
-            const transactionResult = await client.post('/transactions', transactionData)
-            console.log(transactionResult.data.message)
-            const isSuccessfull = transactionResult.data.isSuccessfull
-            if ( isSuccessfull === true) {
-                // queryClient.invalidateQueries({ queryKey: ['accounts'] });
-                reverseState();
-            }
-        } catch (error) {
-            console.log(error)
-        }
+        transactionMutate(transactionData)
     }
 
     const AccountOptions = data?.accountData.map((item) => (

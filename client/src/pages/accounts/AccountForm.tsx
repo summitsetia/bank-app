@@ -1,16 +1,30 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import Button from "../../components/Button";
-import { useQueryClient } from '@tanstack/react-query';
-import client from "../../api/axiosClient";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createAccount } from "../../api/accounts";
 
 const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
     const queryClient = useQueryClient();
 
-    const [accountData, setAccountData] = useState<{ accountType: string; balance: string }>({
+    const [accountData, setAccountData] = useState<{ accountType: string; balance: string, accountName: string; }>({
         accountType: "",
-        balance: ""
+        balance: "",
+        accountName: ""
     });
+
+    const { mutate } = useMutation({
+        mutationFn: createAccount,
+        onSuccess: (data) => {
+            if (data.isSuccessfull === true) {
+                queryClient.invalidateQueries({ queryKey: ['accounts'] });
+                reverseState();
+            }
+        },
+        onError: (error) => {
+            console.log("Failed to create account", error);
+        }
+    })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {value, name} = e.target;
@@ -24,17 +38,7 @@ const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        try {
-            const accountResult = await client.post('/accounts', accountData)
-            console.log(accountResult.data.message)
-            const isSuccessfull = accountResult.data.isSuccessfull
-            if ( isSuccessfull === true) {
-                queryClient.invalidateQueries({ queryKey: ['accounts'] });
-                reverseState();
-            }
-        } catch (error) {
-            console.log(error)
-        }
+        mutate(accountData);
     }
 
     return (
@@ -55,7 +59,11 @@ const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
                 </div>
                 <div className="flex flex-col items-center gap-2">
                     <label className="">Balance (In Dollars $)</label>
-                    <input className="p-2 rounded border" placeholder="Balance ($)" name="balance" onChange={handleChange} value={accountData.balance} type="number" />
+                    <input className="p-2 rounded border" placeholder="Balance ($)" name="balance" onChange={handleChange} value={accountData.balance} type="number" required/>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                    <label className="">Account Name</label>
+                    <input className="p-2 rounded border" placeholder="Name Of Account" name="accountName" onChange={handleChange} value={accountData.accountName} required/>
                 </div>
                 <Button content={"Open New Account"} />
             </form>

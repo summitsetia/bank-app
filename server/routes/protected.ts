@@ -21,18 +21,18 @@ const protectedRoutes = (app: Express) => {
     app.get("/userData", authMiddleware, async (req: CustomRequest, res: Response) => {
         const userId = req.user?.user_id;
 
-        const accountResult = await db.query("SELECT account_type, balance, created_at FROM accounts WHERE user_id = $1", [userId])
+        const accountResult = await db.query("SELECT account_type, balance, account_name, created_at FROM accounts WHERE user_id = $1", [userId])
         res.json({ userData:req.user, accountData: accountResult.rows, message: "Success"})
     })
 
     app.post("/accounts", authMiddleware, async (req: CustomRequest, res: Response) => {
     const userId = req.user?.user_id;
-    const { accountType, balance } = req.body;
+    const { accountType, balance, accountName } = req.body;
 
     try {
         await db.query(
-            "INSERT INTO accounts (user_id, account_type, balance) VALUES ($1, $2, $3)",
-            [userId, accountType, balance]
+            "INSERT INTO accounts (user_id, account_type, balance, account_name) VALUES ($1, $2, $3, $4)",
+            [userId, accountType, balance, accountName]
         );
         res.json({ isSuccessfull: true, message: "Success" });
     } catch (error) {
