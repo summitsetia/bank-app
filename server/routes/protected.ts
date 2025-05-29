@@ -63,15 +63,20 @@ const protectedRoutes = (app: Express) => {
                  [userId, fromAccount, amount, transactionType, description]
                 )
             const transactionId = transactionResult.rows[0].transaction_id;
+            await db.query("UPDATE accounts SET balance = balance - $1 WHERE account_id = $2", [Number(amount), fromAccount])
             if (transactionType === "Payment") {
                 const { title } = req.body;
                 await db.query("INSERT INTO payment (transaction_id, title) VALUES ($1, $2)",[transactionId, title])
             } else if (transactionType === "Transfer") {
                 const { toAccount } = req.body;
                 await db.query("INSERT INTO transfer (transaction_id, to_account_id) VALUES ($1, $2)", [transactionId, toAccount])
+                 await db.query("UPDATE accounts SET balance = balance + $1 WHERE account_id = $2", [Number(amount), toAccount])
             } else if (transactionType === "PayToPerson") {
                 const { username } = req.body;
                 await db.query("INSERT into paytoperson (transaction_id, username) VALUES ($1, $2)", [transactionId, username])
+                const result = await db.query("SELECT user_id FROM users WHERE username = $1", [username])
+                const toPayId = result.rows[0].user_id;
+                await db.query("UPDATE accounts SET balance = balance + $1 WHERE user_id = $2 AND account_name = $3", [Number(amount), toPayId, "Initial Account"])
             } else {
                 console.log("Unable To Insert Into Transfer Type Table")
             }

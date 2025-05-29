@@ -74,7 +74,7 @@ const publicRoutes = (app: Express, saltRounds: number) => {
           );
           console.log(userData)
 
-          await db.query("INSERT INTO accounts (user_id, account_type, account_name) VALUES ($1, $2, $3)", [userData.rows[0].user_id, "Jumpstart", "Intial Account"])
+          await db.query("INSERT INTO accounts (user_id, account_type, account_name) VALUES ($1, $2, $3)", [userData.rows[0].user_id, "Jumpstart", "Initial Account"])
 
           res.cookie("session_id", sessionId, { secure: true, httpOnly: true });
           res.json({ isAuthenticated: true });

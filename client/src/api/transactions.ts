@@ -2,11 +2,11 @@ import { queryOptions } from "@tanstack/react-query";
 import client from "./axiosClient";
 
 interface TransactionData {
-    transactionType: string;
+    transaction_type: string;
     amount: string;
-    fromAccount: string;
+    from_account_id: string;
     description: string;
-    toAccount?: string; 
+    to_account_id?: string; 
     title?: string;
     username?: string;
     created_at: string;

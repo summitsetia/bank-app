@@ -18,8 +18,12 @@ const Dashboard = () => {
     return accumulator + Number(current.balance);
   }, 0)
 
+  const spendingSum = transactionData?.data.reduce((accumulator, current) => {
+    return accumulator + Number(current.amount)
+  }, 0)
+
   return (
-    <div className="flex flex-col w-full max-w-screen-xl mx-auto my-4">
+    <div className="flex flex-col w-full max-w-screen-xl mx-auto my-4 space-y-8">
       <div className="flex justify-between items-center w-full px-4 py-4 p-6 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl shadow-md">
         <div className='flex items-center gap-4'>
           <h1>Photo</h1>
@@ -56,31 +60,19 @@ const Dashboard = () => {
         <div className='flex space-x-4'>
           <div className="flex-1 flex-col items-center border rounded-2xl px-4 py-4 h-48">
             <h1 className='text-xl font-semibold text-gray-700'>Recent Activity</h1>
-            <div className='flex justify-between w-full'>
-              <h1>Name</h1>
-              <h1>Account</h1>
-              <h1>Price</h1>
-            </div>
-            <div className='flex justify-between w-full'>
-              <h1>Name</h1>
-              <h1>Account</h1>
-              <h1>Price</h1>
-            </div>
-            <div className='flex justify-between w-full'>
-              <h1>Name</h1>
-              <h1>Account</h1>
-              <h1>Price</h1>
-            </div>
-            {transactionData?.data.map((item) => (
+            {transactionData?.data.map((transaction) => (
               <div className='flex justify-between w-full'> 
-                {item.description}
+                <h1>{transaction.transaction_type}</h1>
+                <h1>${transaction.amount}</h1>
+                <h1>{transaction.description}</h1>
+                <h1>Date: {new Date(transaction.created_at).toDateString()} </h1>
               </div>
             ))}
           </div>
 
           <div className="flex flex-col items-center justify-center border rounded-2xl px-4 py-4 h-48">
             <h1 className='text-xl font-semibold text-gray-700'>Spending Summary This Month</h1>
-            <h1 className='text-7xl'>$NUMBER</h1>
+            <h1 className='text-7xl text-red-500'>${spendingSum}</h1>
           </div>
         </div>
 
