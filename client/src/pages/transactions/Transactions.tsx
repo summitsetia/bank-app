@@ -32,6 +32,10 @@ const Transactions = () => {
     return accumulator;
   },{} as Record<string, any[]>)
 
+  const totalIncome = transactionData?.incomeData.reduce((accumulator, income) => (
+    accumulator + Number(income.amount)
+  ), 0)
+
   return (
     <div className='min-h-screen bg-gray-50 w-full'>
 
@@ -89,6 +93,7 @@ const Transactions = () => {
                 <ArrowUpRight className="w-4 h-4 text-green-600" />
               </div>
             </div>
+            <p className='text-2xl font-bold text-gray-900'>${totalIncome}</p>
           </div>
           <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
              <div className='flex items-center justify-between mb-2'>

@@ -77,6 +77,7 @@ const protectedRoutes = (app: Express) => {
                 const result = await db.query("SELECT user_id FROM users WHERE username = $1", [username])
                 const toPayId = result.rows[0].user_id;
                 await db.query("UPDATE accounts SET balance = balance + $1 WHERE user_id = $2 AND account_name = $3", [Number(amount), toPayId, "Initial Account"])
+                await db.query("INSERT INTO income (user_id, transaction_id, amount) VALUES ($1, $2, $3)", [toPayId, transactionId, amount])
             } else {
                 console.log("Unable To Insert Into Transfer Type Table")
             }
@@ -100,7 +101,10 @@ const protectedRoutes = (app: Express) => {
             WHERE transactions.user_id = $1", [userId]
             )
             const transactionData = result.rows;
-            res.json({ data: transactionData, isSuccessfull: true})
+
+            const incomeResult = await db.query("SELECT * FROM income WHERE user_id = $1", [userId])
+            const incomeData = incomeResult.rows;
+            res.json({ data: transactionData, incomeData: incomeData, isSuccessfull: true})
         } catch (error) {
             console.log(error);
             res.json({ isSuccessfull: false });
