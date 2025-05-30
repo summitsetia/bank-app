@@ -20,8 +20,13 @@ const Transactions = () => {
         <div className="flex justify-center mt-[1vh]">
             {isShown && <TransactionForm reverseState={reverseState} />}
         </div>
-        <div className='flex justify-center'>
+        <div className='flex justify-center pt-8'>
           <h1>Transaction Type History</h1>
+        </div>
+        <div className='flex justify-evenly pt-8'>
+          <div>
+            <h1>Transfer Transactions</h1>
+          </div>
         </div>
     </div>
   );

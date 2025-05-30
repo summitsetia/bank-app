@@ -1,57 +1,56 @@
-import bankLogo from '../assets/bankLogo.svg'
-import { CreditCard, LogOut } from 'lucide-react';
+import { CreditCard, LogOut, LayoutDashboard, Banknote } from 'lucide-react';
 import { NavLink, useNavigate } from "react-router";
-import { LayoutDashboard } from 'lucide-react';
-import { Banknote } from 'lucide-react';
-
+import bankLogo from '../assets/bankLogo.png';
 import axios from 'axios';
-
 
 const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const response = await axios.post("http://localhost:3000/logout", {}, {withCredentials: true})
-    const isSuccessfull = response.data.isSuccessfull
-    console.log(isSuccessfull)
-    if (isSuccessfull === true) {
-      navigate("/")
+    const response = await axios.post("http://localhost:3000/logout", {}, { withCredentials: true });
+    if (response.data.isSuccessfull) {
+      navigate("/");
     }
-  }
+  };
 
   const navigationHeadings = [
-    {name: "Dashboard", to: "/dashboard", image: <LayoutDashboard />},
-    {name: "Transactions", to: "/transactions", image: <Banknote />},
-    {name: "Accounts", to:"/accounts", image: <CreditCard />}
-  ]
+    { name: "Dashboard", to: "/dashboard", icon: <LayoutDashboard /> },
+    { name: "Transactions", to: "/transactions", icon: <Banknote /> },
+    { name: "Accounts", to: "/accounts", icon: <CreditCard /> }
+  ];
 
   return (
-    <nav className="bg-[#1c2e4a] h-screen flex flex-col items-center w-48 flex-shrink-0">
-      <div className='flex flex-col items-center gap-4'>
-        <img className="w-28" src={bankLogo}/>
-        <h1 className="text-white text-3xl font-serif drop-shadow-lg">Bank</h1>
+    <nav className="bg-[#f0f6ff] h-screen flex flex-col items-center w-52 flex-shrink-0 py-6 border-r border-blue-100">
+      <div className="flex flex-col items-center gap-4">
+        <img className="w-36 h-auto" src={bankLogo} alt="Bank Logo" />
       </div>
-      <div className='flex flex-col gap-6 items-start mt-12'>
+
+      <div className="flex flex-col gap-4 items-start mt-12 w-full px-4">
         {navigationHeadings.map((item) => (
-          <NavLink 
-          to={item.to} 
-          className={({ isActive }) =>
-              `${isActive ? "bg-white text-[#1c2e4a] font-semibold shadow-md" : "text-white hover:bg-white/20 hover:shadow-sm"} h-full gap-3 py-3 px-5 rounded-xl duration-200`
-          }
-        >
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-5 h-5">
-            {item.image}
-          </div>
-          <span className="text-sm leading-none">{item.name}</span>
-        </div>
-        </NavLink>
+          <NavLink
+            key={item.name}
+            to={item.to}
+            className={({ isActive }) =>
+              `${isActive
+                ? "bg-white text-[#1c2e4a] font-semibold shadow-md"
+                : "text-[#1c2e4a] hover:bg-white/70 hover:shadow-sm"
+              } w-full text-sm gap-3 py-3 px-4 rounded-xl transition duration-200 flex items-center`
+            }
+          >
+            <div className="w-5 h-5">{item.icon}</div>
+            <span className="text-sm leading-none ml-2">{item.name}</span>
+          </NavLink>
         ))}
       </div>
-      <div className='flex-grow'></div>
-      <div className="mb-6">
-        <button className="text-white hover:text-red-400 transition duration-200" onClick={handleLogout}>
-          <LogOut size={32} />
+
+      <div className="flex-grow" />
+
+      <div className="mb-4">
+        <button
+          className="text-[#1c2e4a] hover:text-red-500 transition duration-200"
+          onClick={handleLogout}
+        >
+          <LogOut size={28} />
         </button>
       </div>
     </nav>
