@@ -20,7 +20,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-[#f0f6ff] h-screen flex flex-col items-center w-52 flex-shrink-0 py-6 border-r border-blue-100">
+    <nav className="bg-gray-50 h-screen flex flex-col items-center w-52 flex-shrink-0 py-6 border-r border-gray-300">
       <div className="flex flex-col items-center gap-4">
         <img className="w-36 h-auto" src={bankLogo} alt="Bank Logo" />
       </div>

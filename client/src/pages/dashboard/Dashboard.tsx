@@ -25,6 +25,7 @@ const Dashboard = () => {
   }, 0)
 
   const recentTransactions = transactionData?.data.slice(0, 3) || [];
+  const fixedAccounts = accountData?.accountData.slice(0, 3) || [];
 
   return (
     <div className="flex-1 bg-gray-50">
@@ -90,7 +91,7 @@ const Dashboard = () => {
             </div>
 
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-              {accountData?.accountData.map((account) => (
+              {fixedAccounts.map((account) => (
                 <div className='border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
@@ -113,9 +114,9 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className='lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
                 <div className='flex items-center justify-between mb-6'>
-                  <h1 className='text-lg font-semibold text-gray-900'>Your Accounts</h1>
+                  <h1 className='text-lg font-semibold text-gray-900'>Recent Activity</h1>
                   <button 
-                    onClick={() => navigate("/accounts")}
+                    onClick={() => navigate("/transactions")}
                     className="text-sm text-blue-600 cursor-pointer hover:text-blue-700 font-medium flex items-center gap-1"
                   >
                     View All <ArrowUpRight className="w-4 h-4" />
