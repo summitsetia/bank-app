@@ -34,10 +34,10 @@ const protectedRoutes = (app: Express) => {
             "INSERT INTO accounts (user_id, account_type, balance, account_name) VALUES ($1, $2, $3, $4)",
             [userId, accountType, balance, accountName]
         );
-        res.json({ isSuccessfull: true, message: "Success" });
+        res.json({ isSuccessful: true, message: "Success" });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ isSuccessfull: false, message: "Database error" });
+        res.status(500).json({ isSuccessful: false, message: "Database error" });
     }
     })
 
@@ -46,10 +46,10 @@ const protectedRoutes = (app: Express) => {
             const userId = req.user?.user_id;
             await db.query("UPDATE users SET session_id = NULL WHERE user_id = $1", [userId]);
             res.clearCookie("session_id", { secure: true, httpOnly: true })
-            res.json({ isSuccessfull: true, message: "Logged out successfully" });
+            res.json({ isSuccessful: true, message: "Logged out successfully" });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ isSuccessfull: false, message: "Server error" });
+            res.status(500).json({ isSuccessful: false, message: "Server error" });
         }
     })
 
@@ -66,7 +66,7 @@ const protectedRoutes = (app: Express) => {
             await db.query("UPDATE accounts SET balance = balance - $1 WHERE account_id = $2", [Number(amount), fromAccount])
             if (transactionType === "Payment") {
                 const { title } = req.body;
-                await db.query("INSERT INTO payment (transaction_id, title) VALUES ($1, $2)",[transactionId, title])
+                await db.query("INSERT INTO payment (transaction_id, payee) VALUES ($1, $2)",[transactionId, title])
             } else if (transactionType === "Transfer") {
                 const { toAccount } = req.body;
                 await db.query("INSERT INTO transfer (transaction_id, to_account_id) VALUES ($1, $2)", [transactionId, toAccount])
@@ -77,37 +77,70 @@ const protectedRoutes = (app: Express) => {
                 const result = await db.query("SELECT user_id FROM users WHERE username = $1", [username])
                 const toPayId = result.rows[0].user_id;
                 await db.query("UPDATE accounts SET balance = balance + $1 WHERE user_id = $2 AND account_name = $3", [Number(amount), toPayId, "Initial Account"])
-                await db.query("INSERT INTO income (user_id, transaction_id, amount) VALUES ($1, $2, $3)", [toPayId, transactionId, amount])
+                await db.query("INSERT INTO income (user_id, transaction_id, amount, transaction_type) VALUES ($1, $2, $3, $4)", [toPayId, transactionId, amount, "Income"])
             } else {
                 console.log("Unable To Insert Into Transfer Type Table")
             }
 
-            res.json({ transactionId: transactionId, isSuccessfull: true });
+            res.json({ transactionId: transactionId, isSuccessful: true });
         } catch (error) {
             console.log(error);
-            res.json({ isSuccessfull: false });
+            res.json({ isSuccessful: false });
         }
     })
 
     app.get("/transactionData", authMiddleware, async (req: CustomRequest, res: Response) => {
         const userId = req.user?.user_id;
-        try {
-            const result = await db.query(         
-            "SELECT transactions.transaction_type, transactions.amount, transactions.from_account_id, transactions.description, transactions.created_at, transfer.to_account_id, payment.title, paytoperson.username \
-            FROM transactions \
-            LEFT JOIN transfer ON transactions.transaction_id = transfer.transaction_id \
-            LEFT JOIN payment ON transactions.transaction_id = payment.transaction_id \
-            LEFT JOIN paytoperson ON transactions.transaction_id = paytoperson.transaction_id \
-            WHERE transactions.user_id = $1", [userId]
-            )
-            const transactionData = result.rows;
 
-            const incomeResult = await db.query("SELECT * FROM income WHERE user_id = $1", [userId])
-            const incomeData = incomeResult.rows;
-            res.json({ data: transactionData, incomeData: incomeData, isSuccessfull: true})
+        try {
+            const paymentResult = await db.query(
+                `SELECT transactions.transaction_type, transactions.amount, transactions.from_account_id, 
+                        transactions.description, transactions.created_at, payment.payee
+                FROM transactions
+                LEFT JOIN payment ON transactions.transaction_id = payment.transaction_id
+                WHERE transactions.user_id = $1 AND transactions.transaction_type = 'Payment'`, 
+                [userId]
+            );
+
+            const transferResult = await db.query(
+                `SELECT transactions.transaction_type, transactions.amount, transactions.from_account_id, 
+                        transactions.description, transactions.created_at, transfer.to_account_id
+                FROM transactions
+                LEFT JOIN transfer ON transactions.transaction_id = transfer.transaction_id
+                WHERE transactions.user_id = $1 AND transactions.transaction_type = 'Transfer'`, 
+                [userId]
+            );
+
+            const payToPersonResult = await db.query(
+                `SELECT transactions.transaction_type, transactions.amount, transactions.from_account_id, 
+                        transactions.description, transactions.created_at, paytoperson.username
+                FROM transactions
+                LEFT JOIN paytoperson ON transactions.transaction_id = paytoperson.transaction_id
+                WHERE transactions.user_id = $1 AND transactions.transaction_type = 'PayToPerson'`, 
+                [userId]
+            );
+
+            const incomeResult = await db.query(
+                `SELECT income.income_id, income.user_id, income.transaction_id, income.amount, income.transaction_type, income.created_at, 
+                        transactions.description, transactions.from_account_id
+                FROM income
+                JOIN transactions ON income.transaction_id = transactions.transaction_id
+                WHERE income.user_id = $1`,
+                [userId]
+            );
+
+            const allData = [
+                ...paymentResult.rows,
+                ...transferResult.rows,
+                ...payToPersonResult.rows,
+                ...incomeResult.rows
+            ];
+
+            res.json({ allData, isSuccessful: true });
+
         } catch (error) {
-            console.log(error);
-            res.json({ isSuccessfull: false });
+            console.error("Error fetching transactions:", error);
+            res.json({ isSuccessful: false });
         }
     })
 

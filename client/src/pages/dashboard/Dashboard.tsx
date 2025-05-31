@@ -1,5 +1,5 @@
 import { type JSX } from 'react';
-import { ArrowDownRight, ArrowUpRight, BadgeDollarSign, Eye, PiggyBank, SquarePlus, TrendingUp, Vault } from 'lucide-react';
+import { ArrowUpRight, BadgeDollarSign, Eye, PiggyBank, SquarePlus, TrendingUp, Vault } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { createAccountsQuery } from '../../api/accounts';
 import { createTransactionQuery } from '../../api/transactions';
@@ -16,16 +16,18 @@ const Dashboard = () => {
   const { data: accountData } = useQuery(createAccountsQuery())
   const { data: transactionData } = useQuery(createTransactionQuery())
 
-  const balanceSum = accountData?.accountData.reduce((accumulator, current) => {
+  const balanceSum = accountData?.accountData?.reduce((accumulator, current) => {
     return accumulator + Number(current.balance);
   }, 0)
 
-  const spendingSum = transactionData?.data.reduce((accumulator, current) => {
+  const transactionsOnly = transactionData?.allData?.filter(item => item.transaction_type) || [];
+  
+  const spendingSum = transactionsOnly.reduce((accumulator, current) => {
     return accumulator + Number(current.amount)
   }, 0)
 
-  const recentTransactions = transactionData?.data.slice(0, 3) || [];
-  const fixedAccounts = accountData?.accountData.slice(0, 3) || [];
+  const recentTransactions = transactionsOnly.slice(0, 3);
+  const fixedAccounts = accountData?.accountData?.slice(0, 3) || [];
 
   return (
     <div className="flex-1 bg-gray-50">
@@ -36,12 +38,12 @@ const Dashboard = () => {
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">👤</div>
             <div className='flex flex-col'>
               <h1 className='text-base font-light'>Welcome Back,</h1>
-              <p className="text-xl font-bold">{accountData?.userData.first_name} {accountData?.userData.last_name}</p>
+              <p className="text-xl font-bold">{accountData?.userData?.first_name} {accountData?.userData?.last_name}</p>
             </div>
           </div>
           <div className="">
             <p className="text-sm text-right">Total Balance</p>
-            <p className="text-2xl font-bold">${balanceSum?.toFixed(2)}</p>
+            <p className="text-2xl font-bold">${balanceSum?.toFixed(2) || '0.00'}</p>
           </div>
         </div>
 
@@ -53,7 +55,7 @@ const Dashboard = () => {
                 <BadgeDollarSign className="w-4 h-4 text-blue-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{accountData?.accountData.length || 0}</p>
+            <p className="text-2xl font-bold text-gray-900">{accountData?.accountData?.length || 0}</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -63,7 +65,7 @@ const Dashboard = () => {
                 <TrendingUp className="w-4 h-4 text-red-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">${spendingSum?.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-gray-900">${spendingSum?.toFixed(2) || '0.00'}</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -73,7 +75,7 @@ const Dashboard = () => {
                 <ArrowUpRight className="w-4 h-4 text-green-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{transactionData?.data.length || 0}</p>
+            <p className="text-2xl font-bold text-gray-900">{transactionsOnly.length}</p>
           </div>
         </div>
 
@@ -91,8 +93,8 @@ const Dashboard = () => {
             </div>
 
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-              {fixedAccounts.map((account) => (
-                <div className='border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'>
+              {fixedAccounts.map((account, index) => (
+                <div key={account.account_id || index} className='border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
                       {accountIcons[account.account_type] || <BadgeDollarSign className="w-5 h-5" />}
@@ -132,7 +134,7 @@ const Dashboard = () => {
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">{transaction.description}</p>
-                          <p className="text-sm text-gray-500">{transaction.transaction_type}</p>
+                          <p className="text-sm text-gray-500 capitalize">{transaction.transaction_type}</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -148,7 +150,7 @@ const Dashboard = () => {
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <Eye className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                    <p>No recent transactions</p>
+                    <p>No recent activity</p>
                   </div>
                 )}
                 </div>

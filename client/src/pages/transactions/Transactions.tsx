@@ -2,7 +2,7 @@ import { useState } from 'react';
 import TransactionForm from "./TransactionForm";
 import { useQuery } from '@tanstack/react-query';
 import { createTransactionQuery } from '../../api/transactions';
-import { ArrowDownRight, ArrowUpRight, Calendar, DollarSign, Filter, Plus, Search } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Calendar, DollarSign, Filter, Plus, Search, Send, CreditCard, Users } from 'lucide-react';
 
 const Transactions = () => {
   const [isShown, setIsShown] = useState<boolean>(false);
@@ -14,27 +14,45 @@ const Transactions = () => {
     setIsShown((prevValue) => !prevValue)
   }
 
-  const filteredTransactions = transactionData?.data.filter((transaction) => {
-    const filteredSearch =  transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) || transaction.transaction_type.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterType === 'all' || transaction.transaction_type.toLowerCase() === filterType.toLowerCase()
-    return filteredSearch && matchesFilter
-})
-
-  const groupedTransactions = filteredTransactions?.reduce((accumulator, transaction) => {
-    const transactionType = transaction.transaction_type;
-
-    if(!accumulator[transactionType]) {
-      accumulator[transactionType] = []
+  const getTransactionIcon = (type: string) => {
+    if (type === "Payment") {
+      return <CreditCard className="w-5 h-5 text-red-600" />;
+    } else if (type === "Transfer") {
+      return <Send className="w-5 h-5 text-blue-600" />;
+    } else if (type === "PayToPerson") {
+      return <Users className="w-5 h-5 text-purple-600" />;
+    } else {
+      return <ArrowUpRight className="w-5 h-5 text-green-600" />;
     }
+  };
 
-    accumulator[transactionType].push(transaction);
+  const isIncomeTransaction = (transaction: any) => {
+    return transaction.transaction_type === 'Income';
+  };
 
-    return accumulator;
-  },{} as Record<string, any[]>)
+  const allTransactions = transactionData?.allData ? 
+    [...transactionData.allData].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) 
+    : [];
 
-  const totalIncome = transactionData?.incomeData.reduce((accumulator, income) => (
-    accumulator + Number(income.amount)
-  ), 0)
+  const filteredTransactions = allTransactions.filter((transaction) => {
+    const filteredSearch = transaction.description?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          transaction.transaction_type?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterType === 'all' || transaction.transaction_type?.toLowerCase() === filterType.toLowerCase()
+    return filteredSearch && matchesFilter
+  });
+
+  const totalIncome = transactionData?.allData?.filter(t => isIncomeTransaction(t))
+    .reduce((accumulator, income) => accumulator + Number(income.amount), 0) || 0;
+
+  const totalSpending = transactionData?.allData?.filter((t) => !isIncomeTransaction(t))
+    .reduce((accumulator, t) => accumulator + Number(t.amount), 0) || 0;
+
+  const thisMonthTransactions = transactionData?.allData?.filter((transaction) => {
+    const transactionDate = new Date(transaction.created_at);
+    const currentDate = new Date();
+    return transactionDate.getMonth() === currentDate.getMonth() && 
+           transactionDate.getFullYear() === currentDate.getFullYear();
+  }) || [];
 
   return (
     <div className='min-h-screen bg-gray-50 w-full'>
@@ -68,7 +86,7 @@ const Transactions = () => {
                 <DollarSign className="w-4 h-4 text-blue-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{transactionData?.data?.length || 0}</p>
+            <p className="text-2xl font-bold text-gray-900">{transactionData?.allData?.length || 0}</p>
           </div>
           <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
              <div className='flex items-center justify-between mb-2'>
@@ -77,14 +95,7 @@ const Transactions = () => {
                 <Calendar className="w-4 h-4 text-green-600" />
               </div>
             </div>
-            <p className='text-2xl font-bold text-gray-900'>
-              {transactionData?.data.filter((transaction) => {
-                const transactionDate = new Date(transaction.created_at);
-                const currentDate = new Date();
-                const thisMonth = transactionDate.getMonth() === currentDate.getMonth() && transactionDate.getFullYear() === currentDate.getFullYear();
-                return thisMonth
-              }).length || 0}
-            </p>
+            <p className='text-2xl font-bold text-gray-900'>{thisMonthTransactions.length}</p>
           </div>
           <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
              <div className='flex items-center justify-between mb-2'>
@@ -93,7 +104,7 @@ const Transactions = () => {
                 <ArrowUpRight className="w-4 h-4 text-green-600" />
               </div>
             </div>
-            <p className='text-2xl font-bold text-gray-900'>${totalIncome}</p>
+            <p className='text-2xl font-bold text-gray-900'>${totalIncome.toFixed(2)}</p>
           </div>
           <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
              <div className='flex items-center justify-between mb-2'>
@@ -102,6 +113,7 @@ const Transactions = () => {
                 <ArrowDownRight className="w-4 h-4 text-red-600" />
               </div>
             </div>
+            <p className='text-2xl font-bold text-gray-900'>${totalSpending.toFixed(2)}</p>
           </div>                    
         </div>
 
@@ -125,49 +137,55 @@ const Transactions = () => {
                 className="pl-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
               >
                  <option value="all">All Types</option>
-                 <option value="Transfer">Transfer</option>
-                 <option value="Payment">Payment</option>
-                 <option value="PayToPerson">PayToPerson</option>
+                 <option value="transfer">Transfer</option>
+                 <option value="payment">Payment</option>
+                 <option value="paytoperson">PayToPerson</option>
+                 <option value="income">Income</option>
               </select>
             </div>
           </div>
         </div>
         
-        <div className='space-y-6'>
-          {groupedTransactions && Object.entries(groupedTransactions).length > 0 ? (
-            Object.entries(groupedTransactions).map(([type, transactions]) => (
-              <div key={type} className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-                <div className='flex items-center justify-between mb-4'>
-                  <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    {type} Transactions
-                  </h2>
-                   <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
-                    {transactions.length} Transaction(s)
-                  </span>
-                </div>
+        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
+          <div className='flex items-center justify-between mb-6'>
+            <h2 className="text-lg font-semibold text-gray-900">All Transactions</h2>
+            <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
+              {filteredTransactions.length} Transaction(s)
+            </span>
+          </div>
 
-                <div className='space-y-2'>
-                  {transactions.map((transaction, index) => (
-                    <div key={index} className='flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50'>
-                      <div className='flex items-center gap-4'>
-                        <div className='w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center'>
-                          <ArrowUpRight className="w-5 h-5 text-red-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{transaction.description}</p>
-                          <p>{new Date(transaction.created_at).toDateString()}</p>
-                        </div>
+          {filteredTransactions.length > 0 ? (
+            <div className='space-y-2'>
+              {filteredTransactions.map((transaction, index) => {
+                const isIncome = isIncomeTransaction(transaction);
+                const amount = Number(transaction.amount);
+                
+                return (
+                  <div key={index} className='flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors'>
+                    <div className='flex items-center gap-4'>
+                      <div className='w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center'>
+                        {getTransactionIcon(transaction.transaction_type)}
                       </div>
-                      <div className="text-right">
-                        <p className='text-lg font-semibold text-red-600'>-${Number(transaction.amount).toFixed(2)}</p>
+                      <div>
+                        <p className="font-medium text-gray-900">{transaction.description}</p>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <span className="capitalize">{transaction.transaction_type}</span>
+                          <span>•</span>
+                          <span>{new Date(transaction.created_at).toDateString()}</span>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))
+                    <div className="text-right">
+                      <p className={`text-lg font-semibold ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
+                        {isIncome ? '+' : '-'}${amount.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+            <div className="p-12 text-center">
               <DollarSign className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No transactions found</h3>
               <p className="text-gray-500 mb-6">
@@ -185,11 +203,9 @@ const Transactions = () => {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
 };
-
 
 export default Transactions;

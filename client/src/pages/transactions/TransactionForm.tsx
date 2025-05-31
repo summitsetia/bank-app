@@ -44,7 +44,7 @@ const TransactionForm = ({ reverseState }: { reverseState: () => void }) => {
     const { mutate: transactionMutate} = useMutation({
         mutationFn: createTransaction,
         onSuccess: (data) => {
-            if (data.isSuccessfull === true) {
+            if (data.isSuccessful === true) {
                 queryClient.invalidateQueries({ queryKey: ['transactions'] });
                 reverseState();
             }

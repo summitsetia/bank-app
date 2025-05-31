@@ -16,7 +16,7 @@ const AccountForm = ({ reverseState }: { reverseState: () => void }) => {
     const { mutate } = useMutation({
         mutationFn: createAccount,
         onSuccess: (data) => {
-            if (data.isSuccessfull === true) {
+            if (data.isSuccessful === true) {
                 queryClient.invalidateQueries({ queryKey: ['accounts'] });
                 reverseState();
             }
