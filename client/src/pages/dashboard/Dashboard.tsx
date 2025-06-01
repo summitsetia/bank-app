@@ -30,7 +30,7 @@ const Dashboard = () => {
   const fixedAccounts = accountData?.accountData?.slice(0, 3) || [];
 
   return (
-    <div className="flex-1 bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <div className='w-full max-w-screen-xl mx-auto my-4 space-y-8'>
 
         <div className="flex justify-between items-center w-full px-6 py-6 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl shadow-md">

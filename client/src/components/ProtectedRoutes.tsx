@@ -30,7 +30,7 @@ const ProtectedRoutes = () => {
   if (checkingAuth) return <div className="p-4">Checking authentication...</div>;
 
   return (
-    <div className="flex">
+    <div className="ml-42">
       <Navbar />
       <Outlet />
     </div>
