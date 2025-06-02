@@ -1,13 +1,13 @@
 import { CreditCard, LogOut, LayoutDashboard, Banknote } from 'lucide-react';
 import { NavLink, useNavigate } from "react-router";
 import bankLogo from '../assets/bankLogo.png';
-import axios from 'axios';
+import client from '../api/axiosClient';
 
 const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const response = await axios.post("http://localhost:3000/logout", {}, { withCredentials: true });
+    const response = await client.post("/logout", {}, { withCredentials: true });
     if (response.data.isSuccessful) {
       navigate("/");
     }
