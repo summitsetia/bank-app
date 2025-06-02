@@ -15,7 +15,8 @@ db.connect();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173",
+    "https://bank.summitsetia.com"],
     credentials: true,
   })
 );
@@ -26,15 +27,6 @@ app.use(cookieParser());
 publicRoutes(app, saltRounds);
 protectedRoutes(app);
 
-// // chnage this to be proper, same as other middleware
-// app.post("/welcome", (req: Request, res: Response) => {
-//   const cookie = req.cookies;
-//   if (Object.keys(cookie).length > 0) {
-//     res.json({ isAuthenticated: true });
-//   } else {
-//     res.json({ isAuthenticated: false });
-//   }
-// });
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
