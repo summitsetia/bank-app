@@ -1,6 +1,7 @@
 import { useState } from 'react';
-// import bankLogo from '../../assets/bankLogo.svg';
+import bankLogo from '../../assets/bankLogo.png';
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import client from '../../api/axiosClient';
 import Button from '../../components/Button';
 import checkUsername from '../../api/UsernameCheck';
@@ -65,45 +66,157 @@ const Register = () => {
     }
 
     return (
-        <div className="flex justify-center items-center h-screen">
-            <div className="bg-[#fcfcfc] border rounded-2xl h-132 w-132 flex flex-col items-center justify-center">
-                {/* <img className="w-28 h-28" src={bankLogo} alt="Bank Logo" /> */}
-                <h1 className="text-[#003366] font-semibold text-3xl mb-4 mt-4">Sign Up</h1>
-                <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-                    <input className="p-2 rounded border" placeholder="First Name" name="fName" onChange={handleChange} value={registerData.fName} required/>
-                    <input className="p-2 rounded border" placeholder="Last Name" name="lName" onChange={handleChange} value={registerData.lName} required/>
-                    <input className="p-2 rounded border" placeholder="Email" name="email" onChange={handleChange} value={registerData.email} required/>
-                    <input className="p-2 rounded border" placeholder="Password" name="password" onChange={handleChange} type="password" value={registerData.password} required/>
-                    <div className="relative">
-                        <input
-                            className="p-2 rounded border w-full pr-10"
-                            placeholder="Username"
-                            name="username"
-                            onChange={handleChange}
-                            onBlur={handleCheckUsername}
-                            value={registerData.username}
-                            required
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
+                
+                <div className="text-center lg:text-left space-y-6 order-2 lg:order-1">
+                    <div className="flex items-center justify-center lg:justify-start">
+                        <img 
+                            src={bankLogo} 
+                            alt="Bank Logo" 
+                            className="w-36 h-auto"
                         />
-                        
-                        {isPending && (
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                <Ellipsis />
-                            </div>
-                        )}
-
-                        {isSuccess && !userFound && (
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600">
-                                <Check />
-                            </div>
-                        )}
-                        {isSuccess && userFound && (
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600">
-                                <X />
-                            </div>
-                        )}
+                        <h1 className="text-5xl font-bold text-slate-800">
+                            Bank<span className="text-blue-600">App</span>
+                        </h1>
                     </div>
-                    <Button content={"Join"}/>
-                </form>
+                </div>
+
+                <div className="w-full max-w-md mx-auto order-1 lg:order-2">
+                    <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-semibold text-slate-800 mb-2">Create Account</h2>
+                            <p className="text-slate-600">Start your banking journey today</p>
+                        </div>
+
+                        <form className="space-y-5" onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="fName" className="block text-sm font-medium text-slate-700 mb-2">
+                                        First Name
+                                    </label>
+                                    <input 
+                                        id="fName"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-slate-900 placeholder-slate-400" 
+                                        placeholder="First Name" 
+                                        name="fName" 
+                                        onChange={handleChange} 
+                                        value={registerData.fName} 
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="lName" className="block text-sm font-medium text-slate-700 mb-2">
+                                        Last Name
+                                    </label>
+                                    <input 
+                                        id="lName"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-slate-900 placeholder-slate-400" 
+                                        placeholder="Last Name" 
+                                        name="lName" 
+                                        onChange={handleChange} 
+                                        value={registerData.lName} 
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                                    Email
+                                </label>
+                                <input 
+                                    id="email"
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-slate-900 placeholder-slate-400" 
+                                    placeholder="Enter your email" 
+                                    name="email" 
+                                    type="email"
+                                    onChange={handleChange} 
+                                    value={registerData.email} 
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+                                    Password
+                                </label>
+                                <input 
+                                    id="password"
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-slate-900 placeholder-slate-400" 
+                                    placeholder="Create a password" 
+                                    name="password" 
+                                    type="password"
+                                    onChange={handleChange} 
+                                    value={registerData.password} 
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
+                                    Username
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        id="username"
+                                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-slate-900 placeholder-slate-400 ${
+                                            isSuccess && userFound ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 
+                                            isSuccess && !userFound ? 'border-green-300 focus:ring-green-500 focus:border-green-500' : 
+                                            'border-slate-300'
+                                        }`}
+                                        placeholder="Choose a username"
+                                        name="username"
+                                        onChange={handleChange}
+                                        onBlur={handleCheckUsername}
+                                        value={registerData.username}
+                                        required
+                                    />
+                                    
+                                    {isPending && (
+                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                                            <Ellipsis className="animate-pulse" size={20} />
+                                        </div>
+                                    )}
+
+                                    {isSuccess && !userFound && (
+                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600">
+                                            <Check size={20} />
+                                        </div>
+                                    )}
+                                    
+                                    {isSuccess && userFound && (
+                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600">
+                                            <X size={20} />
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {isSuccess && userFound && (
+                                    <p className="text-red-600 text-sm mt-1">Username is already taken</p>
+                                )}
+                                {isSuccess && !userFound && (
+                                    <p className="text-green-600 text-sm mt-1">Username is available</p>
+                                )}
+                            </div>
+
+                            <div className="pt-2">
+                                <Button content={"Create Account"}/>
+                            </div>
+                        </form>
+
+                        <div className="mt-6 pt-6 border-t border-slate-200">
+                            <p className="text-center text-slate-600 text-sm mb-4">
+                                Already have an account?
+                            </p>
+                            <Link to="/">
+                                <button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-lg border border-slate-300 transition-colors duration-200">
+                                    Sign In Instead
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

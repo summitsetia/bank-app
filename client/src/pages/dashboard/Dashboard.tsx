@@ -20,7 +20,11 @@ const Dashboard = () => {
     return accumulator + Number(current.balance);
   }, 0)
 
-  const transactionsOnly = transactionData?.allData?.filter(item => item.transaction_type) || [];
+    const allTransactions = transactionData?.allData ? 
+    [...transactionData.allData].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) 
+    : [];
+
+  const transactionsOnly = allTransactions.filter(item => item.transaction_type) || [];
   
   const spendingSum = transactionsOnly.reduce((accumulator, current) => {
     return accumulator + Number(current.amount)
@@ -30,8 +34,8 @@ const Dashboard = () => {
   const fixedAccounts = accountData?.accountData?.slice(0, 3) || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className='w-full max-w-screen-xl mx-auto my-4 space-y-8'>
+    <div className="flex-1 bg-gray-50">
+      <div className='w-full max-w-screen-xl mx-auto p-6 my-4 space-y-8'>
 
         <div className="flex justify-between items-center w-full px-6 py-6 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl shadow-md">
           <div className='flex items-center gap-4'>

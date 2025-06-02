@@ -38,14 +38,42 @@ const Login = () => {
     }; 
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col items-center">
-            <div className='mt-8 p-4'>
-                <input className='w-64 border rounded-lg p-3' name="email" placeholder='email' value={loginData.email} onChange={handleChange}/>
+        <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                    Email
+                </label>
+                <input 
+                    id="email"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-slate-900 placeholder-slate-400" 
+                    name="email" 
+                    type="email"
+                    placeholder="Enter your email" 
+                    value={loginData.email} 
+                    onChange={handleChange}
+                    required
+                />
             </div>
-            <div className='p-4'>
-                <input className='w-64 border rounded-lg p-3' name="password" type="password" placeholder='password' value={loginData.password} onChange={handleChange}/>
+            
+            <div>
+                <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+                    Password
+                </label>
+                <input 
+                    id="password"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-slate-900 placeholder-slate-400" 
+                    name="password" 
+                    type="password" 
+                    placeholder="Enter your password" 
+                    value={loginData.password} 
+                    onChange={handleChange}
+                    required
+                />
             </div>
-            <Button content={"Login"}/>
+            
+            <div className="pt-2">
+                <Button content={"Sign In"}/>
+            </div>
         </form>
     );
 };
