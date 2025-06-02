@@ -2,9 +2,9 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import db from "./db";
-import protectedRoutes from "./routes/protected";
-import publicRoutes from "./routes/public";
+import db from "../db";
+import protectedRoutes from "../routes/protected";
+import publicRoutes from "../routes/public";
 
 
 const app = express();
