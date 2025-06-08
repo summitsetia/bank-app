@@ -35,7 +35,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex-1 bg-gray-50">
-      <div className='w-full max-w-screen-xl mx-auto p-6 my-4 space-y-8'>
+      <div className='w-full max-w-screen-xl mx-auto p-6 space-y-8'>
 
         <div className="flex justify-between items-center w-full px-6 py-6 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl shadow-md">
           <div className='flex items-center gap-4'>
