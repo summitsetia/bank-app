@@ -41,12 +41,12 @@ const Accounts = () => {
   const totalBalance = accountData?.accountData.reduce((sum, acc) => sum + Number(acc.balance), 0) || 0
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <div className="flex-1 min-h-screen bg-gray-50 w-full">
       <div className="flex justify-center mt-[1vh]">
         {isShown && <AccountForm reverseState={reverseState} />}
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 space-y-6">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-2">
             <div>
