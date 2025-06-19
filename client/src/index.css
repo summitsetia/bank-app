@@ -1,15 +1,4 @@
 @import "tailwindcss";
 
-#root {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", Arial, sans-serif;
-  background: #f5f6fa;
-  color: #222;
-  box-sizing: border-box;
-  overscroll-behavior: none;
-}
-
 
 
